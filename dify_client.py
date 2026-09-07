@@ -1,4 +1,5 @@
 import os
+import re
 
 import requests
 from dotenv import load_dotenv
@@ -12,6 +13,31 @@ DIFY_API_URL = os.getenv(
     "DIFY_API_URL",
     "https://api.dify.ai/v1",
 )
+
+
+def clean_answer(answer: str) -> str:
+    """移除回答开头的思考块，仅将正式回答交给界面和 TTS。"""
+    if not isinstance(answer, str):
+        raise RuntimeError("Dify 返回的回答不是文本。")
+
+    text = answer.strip()
+    while True:
+        # Dify 的 reasoning 标记可能位于思考块内或紧邻其前后。
+        marker = re.match(r"<!--dify[^>]*reasoning[^>]*-->", text, re.IGNORECASE)
+        if marker:
+            text = text[marker.end():].lstrip()
+            continue
+        opening = re.match(r"<think\s*>", text, re.IGNORECASE)
+        if not opening:
+            break
+        closing = re.search(r"</think\s*>", text[opening.end():], re.IGNORECASE)
+        if not closing:
+            raise RuntimeError("Dify 的思考内容未完整结束，请重新提问。")
+        text = text[opening.end() + closing.end():].lstrip()
+
+    if not text:
+        raise RuntimeError("Dify 没有返回正式回答，请重新提问。")
+    return text
 
 
 def ask_dify(question):
@@ -46,7 +72,7 @@ def ask_dify(question):
         )
 
     result = response.json()
-    return result["answer"]
+    return clean_answer(result["answer"])
 
 
 def main():
