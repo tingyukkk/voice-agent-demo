@@ -16,6 +16,16 @@ A speech-to-speech question-answering prototype built with SenseVoiceSmall, Dify
 | --- | --- | --- |
 | 浏览器录音或本地音频 | 识别问题 → 生成回答 → 合成语音 | 识别文本、回答文本、可播放的回答音频 |
 
+## 运行截图
+
+以下为本地运行的真实截图。示例问题为「机器学习中的过拟合是什么意思？」：页面展示识别文本、正式回答和生成的语音播放器。
+
+![语音问答界面：录音输入、识别文本和正式回答](docs/images/voice-qa-demo.png)
+
+![生成的语音回答播放器](docs/images/voice-answer-player.png)
+
+截图用于展示界面与本次输出；音频截图本身不包含可播放的声音。
+
 ## 使用方式
 
 在环境配置完成并启动应用后：
